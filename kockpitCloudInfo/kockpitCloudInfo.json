@@ -1,0 +1,34 @@
+{
+    "machineName": "NucleusTesting-Linux",
+    "location": "East US",
+    "resourceGroup": " ",
+    "osVersion": "Ubuntu 18",
+    "vmSize": "Standard_B1s",
+    "disk": "Premium_LRS",
+    "username": "azure",
+    "password": "Shelby51035252",
+    "ip": "Dynamic",
+    "port": ["8181","8182","5000","5001","5002","5003"],
+    "attachDisk": ["1"],
+    "attachDiskSize":["5"]
+}
+
+
+{
+    "machineName" :["kockpitVM1","kockpitVM2","kockpitVM3"], //dynamic
+    "location": "East US",
+    "resourceGroup": " ",
+    "offer": "0001-com-ubuntu-server-focal", //dynamic
+    "publisher": "Canonical",
+    "osVersion": "20_04-lts-gen2",
+    "vmSize": "Standard_D4as_v4", //using API dyanmic 
+    "disk": "Premium_LRS", //description
+    "username": "azure",
+    "password": "Shelby51035252",
+    "ip": "Dynamic"
+}
+//port dynamic 
+// vm on off 
+// additionl disk
+// disk pricing , costing
+//ip listing
