@@ -1,7 +1,8 @@
 {
     "machineName": "NucleusTesting-Linux",
     "location": "East US",
-    "resourceGroup": " ",
+    "subscriptionID": "",
+    "resourceGroup": "kockpit",
     "osVersion": "Ubuntu 18",
     "vmSize": "Standard_B1s",
     "disk": "Premium_LRS",
