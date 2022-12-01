@@ -65,6 +65,15 @@ cd /home/$USER/clouddrive/kockpitCloudInfo/
 # do
 #   echo " mkdir $machineName1$i" | sed "s/['\"]//g" >> directory.sh
 # done
+rg=`jq '.resourceGroup' kockpitCloudInfo.json`
+echo $rg | sed "s/['\"]//g" > /home/$USER/clouddrive/kockpitCloudInfo/list/resourceGRP.txt
+resourceGRP=`awk 'FNR ==1 {print $1}' /home/$USER/clouddrive/kockpitCloudInfo/list/resourceGRP.txt`
+
+loc=`jq '.location' kockpitCloudInfo.json`
+
+subscription=`jq '.subscriptionID' kockpitCloudInfo.json`
+echo $subscription | sed "s/['\"]//g" > /home/$USER/clouddrive/kockpitCloudInfo/list/subscription.txt
+subscriptionID=`awk 'FNR ==1 {print $1}' /home/$USER/clouddrive/kockpitCloudInfo/list/subscription.txt`
 
 OS=`jq '.osVersion' kockpitCloudInfo.json`
 echo $OS | sed "s/['\"]//g" > /home/$USER/clouddrive/kockpitCloudInfo/list/OS.txt
@@ -73,12 +82,12 @@ if [[ $OS == *18* ]]
 then
     mkdir $machineName1
     echo '
-    resource "azurerm_resource_group" "kockpitNucleas" {
-        name     = "kockpitNucleas"
-        location = "Central India"
+    resource "azurerm_resource_group" '$rg' {
+        name     = '$rg'
+        location = '$loc'
     } ' > /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.tf
-
-    echo "terraform import azurerm_resource_group.kockpitNucleas /subscriptions/3f279ea5-d4f5-4dc5-b528-a179ceea52c0/resourceGroups/kockpitNucleas" > /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.sh
+    
+    echo "terraform import azurerm_resource_group.$resourceGRP /subscriptions/$subscriptionID/resourceGroups/$resourceGRP" > /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.sh
 
     echo '
     provider "azurerm" {
@@ -94,12 +103,12 @@ then
       name                = '"$machineName"'-network"
       address_space       = ["10.0.0.0/16"]
       location            = '"$location $location1"'
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
     }
     
     resource "azurerm_subnet" '"$machineName"'-internal" {
       name                 = '"$machineName"'-internal"
-      resource_group_name  = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name  = azurerm_resource_group.'$resourceGRP'.name
       virtual_network_name = azurerm_virtual_network.'"$machineName1"'-main.name
       address_prefixes     = ["10.0.2.0/24"]
     }
@@ -107,7 +116,7 @@ then
     resource "azurerm_network_interface" '"$machineName"'-nic" {
       name                = '"$machineName"'-nic"
       location            = '"$location $location1"'
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
     
       ip_configuration {
         name                          = "testconfiguration1"
@@ -120,9 +129,12 @@ then
     resource "azurerm_virtual_machine" '"$machineName2"' {
       name                  = '"$machineName2"'
       location              = '"$location $location1"'
-      resource_group_name   = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name   = azurerm_resource_group.'$resourceGRP'.name
       network_interface_ids = [azurerm_network_interface.'"$machineName1"'-nic.id]
       vm_size               = '"$vmSize"'
+      
+      delete_os_disk_on_termination = true
+      delete_data_disks_on_termination = true
     
       storage_image_reference {
         publisher = "Canonical"
@@ -151,7 +163,7 @@ then
     resource "azurerm_network_security_group" '"$machineName"'-nsg" {
       name                = '"$machineName"'-nsg"
       location            = '"$location $location1"'
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
     
       security_rule {
         name                       = '"$machineName"'-Port8080"
@@ -198,7 +210,7 @@ then
     
     resource "azurerm_public_ip" '"$machineName"'-publicip" {
       name                = '"$machineName"'-publicip"
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
       location            = '"$location $location1"'
       allocation_method   = '"$ip"'
     
@@ -213,20 +225,21 @@ then
     /bin/bash /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.sh
     terraform apply -auto-approve
     rm -rf /home/$USER/clouddrive/kockpitCloudInfo/$machineName1
+    az vm show -d -g $resourceGRP -n $machineName1 --query publicIps -o tsv
 else 
-    echo "Ubuntu 18 Skipped"    
+    echo " "    
 fi
 
 if [[ $OS == *20* ]]
 then
     mkdir $machineName1
     echo '
-    resource "azurerm_resource_group" "kockpitNucleas" {
-        name     = "kockpitNucleas"
-        location = "Central India"
+    resource "azurerm_resource_group" '$rg' {
+        name     = '$rg'
+        location = '$loc'
     } ' > /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.tf
 
-    echo "terraform import azurerm_resource_group.kockpitNucleas /subscriptions/3f279ea5-d4f5-4dc5-b528-a179ceea52c0/resourceGroups/kockpitNucleas" > /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.sh
+    echo "terraform import azurerm_resource_group.$resourceGRP /subscriptions/$subscriptionID/resourceGroups/$resourceGRP" > /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.sh
 
     echo '
     provider "azurerm" {
@@ -242,12 +255,12 @@ then
       name                = '"$machineName"'-network"
       address_space       = ["10.0.0.0/16"]
       location            = '"$location $location1"'
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
     }
     
     resource "azurerm_subnet" '"$machineName"'-internal" {
       name                 = '"$machineName"'-internal"
-      resource_group_name  = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name  = azurerm_resource_group.'$resourceGRP'.name
       virtual_network_name = azurerm_virtual_network.'"$machineName1"'-main.name
       address_prefixes     = ["10.0.2.0/24"]
     }
@@ -255,7 +268,7 @@ then
     resource "azurerm_network_interface" '"$machineName"'-nic" {
       name                = '"$machineName"'-nic"
       location            = '"$location $location1"'
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
     
       ip_configuration {
         name                          = "testconfiguration1"
@@ -268,7 +281,7 @@ then
     resource "azurerm_virtual_machine" '"$machineName2"' {
       name                  = '"$machineName2"'
       location              = '"$location $location1"'
-      resource_group_name   = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name   = azurerm_resource_group.'$resourceGRP'.name
       network_interface_ids = [azurerm_network_interface.'"$machineName1"'-nic.id]
       vm_size               = '"$vmSize"'
     
@@ -299,7 +312,7 @@ then
     resource "azurerm_network_security_group" '"$machineName"'-nsg" {
       name                = '"$machineName"'-nsg"
       location            = '"$location $location1"'
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
     
       security_rule {
         name                       = '"$machineName"'-Port8080"
@@ -346,7 +359,7 @@ then
     
     resource "azurerm_public_ip" '"$machineName"'-publicip" {
       name                = '"$machineName"'-publicip"
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
       location            = '"$location $location1"'
       allocation_method   = '"$ip"'
     
@@ -361,8 +374,9 @@ then
     /bin/bash /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.sh
     terraform apply -auto-approve
     rm -rf /home/$USER/clouddrive/kockpitCloudInfo/$machineName1
+    az vm show -d -g $resourceGRP -n $machineName1 --query publicIps -o tsv
 else 
-    echo "Ubuntu 20 Skipped"    
+    echo " "    
 fi
 
 
@@ -373,12 +387,12 @@ if [[ $OS == *Windows* ]]
 then
     mkdir $machineName1
     echo '
-    resource "azurerm_resource_group" "kockpitNucleas" {
-        name     = "kockpitNucleas"
-        location = "Central India"
+    resource "azurerm_resource_group" '$rg' {
+        name     = '$rg'
+        location = '$loc'
     } ' > /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.tf
 
-    echo "terraform import azurerm_resource_group.kockpitNucleas /subscriptions/3f279ea5-d4f5-4dc5-b528-a179ceea52c0/resourceGroups/kockpitNucleas" > /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.sh
+    echo "terraform import azurerm_resource_group.$resourceGRP /subscriptions/$subscriptionID/resourceGroups/$resourceGRP" > /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.sh
 
     echo '
     provider "azurerm" {
@@ -390,12 +404,12 @@ then
       name                = '"$machineName"'-network"
       address_space       = ["10.0.0.0/16"]
       location            = '"$location $location1"'
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
     }
     
     resource "azurerm_subnet" '"$machineName2"' {
       name                 = "internal"
-      resource_group_name  = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name  = azurerm_resource_group.'$resourceGRP'.name
       virtual_network_name = azurerm_virtual_network.'"$machineName1"'.name
       address_prefixes     = ["10.0.2.0/24"]
     }
@@ -403,7 +417,7 @@ then
     resource "azurerm_network_interface" '"$machineName1"' {
       name                = '"$machineName"'-nic"
       location            = '"$location $location1"'
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
     
       ip_configuration {
         name                          = "testconfiguration1"
@@ -415,7 +429,7 @@ then
     
     resource "azurerm_windows_virtual_machine" '"$machineName2"' {
       name                = '"$machineName2"'
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
       location            = '"$location $location1"'
       size                = '"$vmSize"'
       admin_username      = '"$username"'
@@ -440,7 +454,7 @@ then
     resource "azurerm_network_security_group" '"$machineName"'-nsg" {
       name                = '"$machineName"'-nsg"
       location            = '"$location $location1"'
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
 
       security_rule {
         name                       = '"$machineName"'-Port8080"
@@ -488,7 +502,7 @@ then
 
     resource "azurerm_public_ip" '"$machineName"'-publicip" {
       name                = '"$machineName"'-publicip"
-      resource_group_name = azurerm_resource_group.kockpitNucleas.name
+      resource_group_name = azurerm_resource_group.'$resourceGRP'.name
       location            = '"$location $location1"'
       allocation_method   = '"$ip"'
     
@@ -503,7 +517,7 @@ then
     /bin/bash /home/$USER/clouddrive/kockpitCloudInfo/$machineName1/import.sh
     terraform apply -auto-approve
     rm -rf /home/$USER/clouddrive/kockpitCloudInfo/$machineName1
-    az vm show -d -g kockpitNucleas -n $machineName1 --query publicIps -o tsv
+    az vm show -d -g $resourceGRP -n $machineName1 --query publicIps -o tsv
 else 
-    echo "Windows 2019 Server Edition Skipped"    
+    echo " "    
 fi

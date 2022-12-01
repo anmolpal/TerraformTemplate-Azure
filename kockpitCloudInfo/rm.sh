@@ -10,3 +10,4 @@ rm -rf terraform
 rm machineName1.txt
 rm machineName2.txt
 rm directory.sh
+rm -rf terraformVM1 terraformVM2 terraformVM terraformVM3

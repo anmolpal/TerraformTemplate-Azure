@@ -85,12 +85,14 @@ then
                 echo '"Standard_B1s": "1 CPU 1GB RAM" :"price": "'$price1'"'
                 echo '"Standard_DS1_v2": "1 CPU 3.5GB RAM" :"price": "'$price2'"'
                 echo '"Standard_B2S": "2 CPU 4GB RAM" :"price": "'$price3'"'
+                echo '"Standard_D2s_v3": "2 CPU 8GB RAM" :"price": "'$price4'"'
             elif [[ $count == 4 ]]
             then   
                 echo '"Standard_B1ls": "1 CPU 0.5GB RAM" :"price": "'$price0'"'
                 echo '"Standard_B1s": "1 CPU 1GB RAM" :"price": "'$price1'"'
                 echo '"Standard_DS1_v2": "1 CPU 3.5GB RAM" :"price": "'$price2'"'
-                echo '"Standard_B2S": "2 CPU 4GB RAM" :"price": "'$price3'"'  
+                echo '"Standard_B2S": "2 CPU 4GB RAM" :"price": "'$price3'"' 
+                echo '"Standard_D2s_v3": "2 CPU 8GB RAM" :"price": "'$price4'"' 
                 echo '"Standard_B4ms": "4 CPU 16GB RAM" :"price": "'$price4'"'
             else
                 echo '"Standard_B1ls": "1 CPU 0.5GB RAM" :"price": "'$price0'"'

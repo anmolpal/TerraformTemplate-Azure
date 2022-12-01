@@ -25,4 +25,3 @@ then
 else
     echo "Successfull"
 fi
-

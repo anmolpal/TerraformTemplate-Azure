@@ -1,16 +1,16 @@
 {
-    "machineName": "NucleusTesting-Linux",
-    "location": "East US",
-    "subscriptionID": "",
-    "resourceGroup": "kockpit",
+    "subscriptionID": "3f279ea5-d4f5-4dc5-b528-a179ceea52c0",
+    "machineName": "terraformtest",
+    "location": "Central India",
+    "resourceGroup": "kockpitNucleas",
     "osVersion": "Ubuntu 18",
-    "vmSize": "Standard_B1s",
+    "vmSize": "Standard_B4ms",
     "disk": "Premium_LRS",
     "username": "azure",
     "password": "Shelby51035252",
     "ip": "Dynamic",
-    "port": ["8181","8182","5000","5001","5002","5003"],
+    "port": ["8181,8081","8182","5000","5001","5002","5003","8080","5432","9870","8080"],
+    "priority":310,
     "attachDisk": ["1"],
-    "attachDiskSize":["5"]
+    "attachDiskSize":["1"]
 }
-
